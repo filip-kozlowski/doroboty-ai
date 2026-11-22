@@ -123,11 +123,13 @@ export function Shell() {
         Przejdź do treści
       </a>
       {workspace ? (
-        <div className="app-frame">
+        <div className="app-frame lav-shell">
           <div className="mobile-header">
             <Link to="/" className="brand">
               <BrandMark />
-              DoRoboty.ai
+              <span>
+                DoRoboty<span className="brand-tld">.ai</span>
+              </span>
             </Link>
             <Button
               aria-label={menuAt === pathname ? "Zamknij menu" : "Otwórz menu"}
@@ -148,7 +150,9 @@ export function Shell() {
           >
             <Link className="brand" to="/">
               <BrandMark />
-              DoRoboty.ai
+              <span>
+                DoRoboty<span className="brand-tld">.ai</span>
+              </span>
             </Link>
             <div className="workspace-label">
               <span className="workspace-avatar">{person.name[0]}</span>
@@ -178,10 +182,13 @@ export function Shell() {
                 <Settings className="size-4" />
                 Ustawienia
               </NavLink>
+              <span className="nav-separator" aria-hidden="true" />
               <Link className="nav-link" to="/oferty">
+                <ArrowUpRight className="size-4" />
                 Wszystkie oferty
               </Link>
               <Link className="nav-link" to="/auth/sign-in">
+                <LogOut className="size-4" />
                 Zmień osobę
               </Link>
             </nav>
@@ -195,7 +202,12 @@ export function Shell() {
                     ? "Strefa pracodawcy"
                     : "Case study"}
               </span>
-              <Link to="/auth/sign-in">{person.name}</Link>
+              <Link to="/auth/sign-in" className="topbar-person">
+                <span className="topbar-avatar" aria-hidden="true">
+                  {person.name[0]}
+                </span>
+                {person.name}
+              </Link>
             </div>
             <main id="main" ref={main} tabIndex={-1} className="main-content outline-none">
               {content}

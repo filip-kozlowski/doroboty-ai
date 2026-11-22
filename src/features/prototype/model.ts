@@ -104,6 +104,18 @@ export const nextStages: Record<Stage, Stage[]> = {
   withdrawn: [],
   hired: [],
 };
+export const verdicts = ["open", "confirmed", "doubtful"] as const;
+export const interviewQuestionSchema = z.object({
+  id,
+  question: z.string().trim().min(1).max(1000),
+  strong: z.string().trim().max(1000),
+  weak: z.string().trim().max(1000),
+  verdict: z.enum(verdicts),
+  note: text,
+});
+export type InterviewQuestion = z.infer<typeof interviewQuestionSchema>;
+// Recruiter's local edits of the interview cheat sheet; absent until the first edit.
+const briefingSchema = z.object({ questions: z.array(interviewQuestionSchema).max(10) });
 const applicationSchema = z.object({
   id,
   candidateId: id,
@@ -122,6 +134,7 @@ const applicationSchema = z.object({
     .array(z.object({ stage: z.enum(stages), at: z.iso.datetime(), note: text }))
     .min(1)
     .max(30),
+  briefing: briefingSchema.optional(),
 });
 const draftSchema = z.object({
   candidateId: id,
@@ -212,6 +225,7 @@ export type Action =
     }
   | { type: "stage"; applicationId: string; stage: Stage; note: string }
   | { type: "withdraw"; applicationId: string }
+  | { type: "briefing"; applicationId: string; questions: InterviewQuestion[] }
   | { type: "publish"; job: z.infer<typeof jobSchema> }
   | { type: "company"; name: string; description: string };
 
@@ -335,6 +349,12 @@ export function transition(
     }
     application.stage = stage;
     application.events.push({ stage, at: now, note: action.type === "stage" ? action.note : "" });
+  } else if (action.type === "briefing") {
+    const p = employer();
+    const application = s.applications.find((x) => x.id === action.applicationId);
+    if (!application || application.companyId !== p.companyId)
+      return fail("Nie można zmienić tej ściągawki.");
+    application.briefing = briefingSchema.parse({ questions: action.questions });
   } else if (action.type === "publish") {
     const p = employer();
     const job = jobSchema.parse(action.job);

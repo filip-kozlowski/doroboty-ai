@@ -141,9 +141,9 @@ test("published job → saved offer/draft → submitted application → employer
   await choose(page, "Karolina Wiśniewska");
   await page.getByRole("link", { name: "Kandydaci", exact: true }).click();
   await page.getByRole("link", { name: "Anna Kowalska", exact: true }).click();
-  await page
-    .getByLabel("Notatka rekrutacyjna (widoczna pracodawcy)")
-    .fill("Notatka pracodawcy — tylko panel firmy.");
+  await page.getByRole("button", { name: "+ Dodaj pytanie", exact: true }).click();
+  await page.getByLabel("Pytanie", { exact: true }).fill("Notatka pracodawcy — tylko panel firmy.");
+  await page.getByRole("button", { name: "Zapisz pytanie", exact: true }).click();
   await page.getByRole("button", { name: "W przeglądzie", exact: true }).click();
   for (const label of ["Zaproszenie na rozmowę", "Pierwsza rozmowa odbyta", "Kolejny etap"])
     await page.getByRole("button", { name: label, exact: true }).click();
@@ -684,57 +684,87 @@ test("homepage surfaces and marketplace action type roles match the shared refer
   }
 });
 
-test("process sheet keeps notes across keyboard tabs and saves stage history with focus", async ({
+test("candidate profile keeps tabs, task result and editable interview questions", async ({
   page,
 }) => {
   await choose(page, "Karolina Wiśniewska");
   await page.goto("/#/app/kandydaci/application-example");
-  const note = page.getByLabel("Notatka rekrutacyjna (widoczna pracodawcy)");
   await expect(
     page.locator(".record-meta").getByText("Match Score: 72%", { exact: true }),
   ).toBeVisible();
-  await expect(page.getByText("Wynik przykładowy", { exact: true })).toHaveCount(0);
   await expect(page.locator("iframe[title='Podgląd CV (PDF)']")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Pobierz CV (PDF)", exact: true })).toHaveCount(0);
-  const text = "Dopytać o decyzje dotyczące automatyzacji obsługi.";
-  await note.fill(text);
-  const answer = page.getByRole("tab", { name: "Odpowiedź", exact: true });
+  const summary = page.getByRole("tab", { name: "Podsumowanie", exact: true });
   const cv = page.getByRole("tab", { name: "CV", exact: true });
-  await answer.focus();
-  await page.keyboard.press("ArrowRight");
-  await expect(cv).toBeFocused();
-  await expect(cv).toHaveAttribute("aria-selected", "true");
-  const preview = page.locator("iframe[title='Podgląd CV (PDF)']");
-  await expect(preview).toBeVisible();
-  await expect(preview).toHaveAttribute("src", /^\.?\/cv\/marek-nowak-cv-v1\.pdf#view=FitH$/);
-  await page.setViewportSize({ width: 390, height: 900 });
-  expect(
-    await preview.evaluate((element) => element.getBoundingClientRect().right <= innerWidth),
-  ).toBe(true);
-  await page.setViewportSize({ width: 1280, height: 1000 });
-  await expect(note).toHaveValue(text);
-  await expect(page.getByRole("link", { name: "Pobierz CV (PDF)", exact: true })).toHaveAttribute(
-    "href",
-    /^\.?\/cv\/marek-nowak-cv-v1\.pdf$/,
-  );
-  await page.keyboard.press("Home");
-  await expect(answer).toBeFocused();
-  await expect(page.getByRole("tabpanel", { name: "Odpowiedź", exact: true })).toContainText(
+  const task = page.getByRole("tab", { name: "Zadanie", exact: true });
+  await expect(page.getByRole("tabpanel", { name: "Podsumowanie", exact: true })).toContainText(
     "Przesłana aplikacja",
   );
-  await expect(note).toHaveValue(text);
-  await expect(preview).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Pobierz CV (PDF)", exact: true })).toHaveCount(0);
+  await summary.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(cv).toBeFocused();
+  const preview = page.locator("iframe[title='Podgląd CV (PDF)']");
+  await expect(preview).toHaveAttribute("src", /^\.?\/cv\/marek-nowak-cv-v1\.pdf#view=FitH$/);
+  await page.keyboard.press("ArrowRight");
+  await expect(task).toHaveAttribute("aria-selected", "true");
+  const taskPanel = page.getByRole("tabpanel", { name: "Zadanie", exact: true });
+  await expect(taskPanel).toContainText("O co prosiliśmy");
+  await expect(taskPanel).toContainText("Jak poszło");
+  const pdf = taskPanel.getByRole("link", { name: /Pobierz/ });
+  const response = await page.request.get((await pdf.getAttribute("href"))!);
+  expect(response.headers()["content-type"]).toContain("application/pdf");
+
+  const questions = page.locator(".lav-question-text");
+  await expect(questions).toHaveCount(3);
+  const second = await questions.nth(1).innerText();
+  const handle = page.getByRole("button", {
+    name: "Przeciągnij pytanie 2, aby zmienić kolejność",
+    exact: true,
+  });
+  await handle.focus();
+  await page.keyboard.press("Space");
+  await page.keyboard.press("ArrowUp");
+  await page.keyboard.press("Enter");
+  await expect(questions.first()).toHaveText(second);
+  await expect(
+    page.getByRole("button", { name: "Przeciągnij pytanie 1, aby zmienić kolejność" }),
+  ).toBeFocused();
+  const first = await questions.first().innerText();
+  await page.setViewportSize({ width: 1280, height: 2400 });
+  await page.locator(".lav-questions").scrollIntoViewIfNeeded();
+  const box = (await page
+    .getByRole("button", { name: "Przeciągnij pytanie 1, aby zmienić kolejność" })
+    .boundingBox())!;
+  const target = (await page.locator(".lav-question").nth(1).boundingBox())!;
+  await page.mouse.move(box.x + 10, box.y + 10);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 10, target.y + target.height - 10, { steps: 10 });
+  await page.mouse.up();
+  await expect(questions.nth(1)).toHaveText(first);
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await handle.focus();
+  await page.keyboard.press("Space");
+  await page.keyboard.press("ArrowUp");
+  await page.keyboard.press("Enter");
+  await expect(questions.first()).toHaveText(second);
+  const text = "Dopytać o decyzje dotyczące automatyzacji obsługi.";
+  await page.getByLabel("Notatka do pytania 1", { exact: true }).fill(text);
+  await page.getByLabel("Notatka do pytania 1", { exact: true }).blur();
+  await page.getByRole("button", { name: "Usuń pytanie 3", exact: true }).click();
+  await expect(questions).toHaveCount(2);
+  await page.getByRole("button", { name: "+ Dodaj pytanie", exact: true }).click();
+  await page.getByLabel("Pytanie", { exact: true }).fill("Jak pracujesz z inżynierami?");
+  await page.getByRole("button", { name: "Zapisz pytanie", exact: true }).click();
+  await page.reload();
+  await expect(questions).toHaveCount(3);
+  await expect(questions.first()).toHaveText(second);
+  await expect(questions.last()).toHaveText("Jak pracujesz z inżynierami?");
+  await expect(page.getByLabel("Notatka do pytania 1", { exact: true })).toHaveValue(text);
+
   await page.getByRole("button", { name: "W przeglądzie", exact: true }).click();
   await expect(page.locator(".record-stage")).toBeFocused();
-  await expect(note).toHaveValue("");
-  await expect(page.locator(".process-timeline")).toContainText(text);
-  await page.reload();
-  await expect(page.locator(".process-timeline")).toContainText(text);
-  await note.fill("Zakończenie przykładowego procesu.");
+  await expect(page.locator(".process-timeline li")).toHaveCount(2);
   await page.getByRole("button", { name: "Proces zakończony", exact: true }).click();
   await expect(page.locator(".record-stage")).toBeFocused();
-  await expect(note).toHaveCount(0);
   await expect(page.locator(".record-actions")).toHaveCount(0);
   await expect(page.locator(".process-timeline li")).toHaveCount(3);
   const accessibility = await new AxeBuilder({ page }).include(".recruiting-record").analyze();
@@ -742,6 +772,7 @@ test("process sheet keeps notes across keyboard tabs and saves stage history wit
   await choose(page, "Marek Nowak");
   await page.goto("/#/app/aplikacje/application-example");
   await expect(page.getByText(text, { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Jak pracujesz z inżynierami?", { exact: true })).toHaveCount(0);
 });
 
 test("process sheet renders custom snapshots and long content on narrow screens", async ({
@@ -786,8 +817,8 @@ test("process sheet renders custom snapshots and long content on narrow screens"
       }),
     ).toBe(true);
   }
-  await page.getByRole("tab", { name: "Odpowiedź", exact: true }).click();
-  await expect(page.getByRole("tabpanel", { name: "Odpowiedź", exact: true })).toContainText(
+  await page.getByRole("tab", { name: "Podsumowanie", exact: true }).click();
+  await expect(page.getByRole("tabpanel", { name: "Podsumowanie", exact: true })).toContainText(
     record.answer,
   );
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

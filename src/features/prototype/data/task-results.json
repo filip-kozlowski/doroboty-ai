@@ -1,0 +1,91 @@
+{
+  "application-example": {
+    "task": {
+      "title": "Oto 20 zgłoszeń od działu finansów klienta. Zaproponuj, jak AI ma je klasyfikować, i pokaż, jak sprawdzisz, czy robi to dobrze.",
+      "sentAt": "2026-11-04T09:00:00.000Z",
+      "returnedAt": "2026-11-05T16:20:00.000Z",
+      "minutes": 14,
+      "tools": ["ChatGPT", "Arkusz Google"],
+      "improved": "ChatGPT zaproponował 9 kategorii. Połączyłem je w 5, bo trzy dotyczyły tego samego problemu z fakturami. Dodałem kategorię „do człowieka” dla zgłoszeń z kwotą powyżej limitu.",
+      "verification": "Sam oznaczyłem wszystkie 20 zgłoszeń i porównałem z wynikiem modelu. Zgodność 16 na 20. Cztery pomyłki dotyczyły zgłoszeń z dwoma problemami naraz.",
+      "brief": [
+        "Wysłaliśmy 20 zanonimizowanych zgłoszeń, które dział finansów naszego klienta dostał w październiku.",
+        "Zaproponuj, na jakie kategorie AI ma automatycznie dzielić takie zgłoszenia i które z nich powinien zawsze obsłużyć człowiek.",
+        "Pokaż, jak sprawdzisz, czy AI klasyfikuje je dobrze. Możesz korzystać z dowolnego narzędzia AI."
+      ],
+      "rules": [
+        "Czas: 10–15 minut",
+        "AI dozwolone, dołącz zapis rozmowy z AI",
+        "Odpowiedz na 2 pytania: co poprawiłeś po AI i jak sprawdziłeś wynik"
+      ],
+      "attachment": "marek-nowak-zadanie-v1.pdf"
+    },
+    "evaluation": {
+      "summary": "Marek sam uprościł propozycję AI i sprawdził ją na własnej próbce. Nie wiemy jeszcze, jak mierzy efekty w prawdziwym projekcie.",
+      "criteria": [
+        {
+          "criterion": "Krytyczna praca z AI",
+          "level": "strong",
+          "comment": "Połączył 9 kategorii od ChatGPT w 5 i uzasadnił dlaczego."
+        },
+        {
+          "criterion": "Sprawdzenie wyniku",
+          "level": "strong",
+          "comment": "Oznaczył 20 zgłoszeń ręcznie i podał zgodność: 16 na 20."
+        },
+        {
+          "criterion": "Zrozumienie ryzyka dla klienta",
+          "level": "partial",
+          "comment": "Dodał regułę dla dużych kwot, ale próg 10 000 zł przyjął bez uzasadnienia."
+        },
+        {
+          "criterion": "Mierzenie efektu po wdrożeniu",
+          "level": "partial",
+          "comment": "Proponuje cotygodniową próbkę, nie mówi, co zrobi, gdy zgodność spadnie."
+        }
+      ],
+      "evaluatedBy": "Zespół DoRoboty.ai"
+    },
+    "claims": [
+      "Zbudował automatyzację obsługi zgłoszeń w produkcie B2B.",
+      "Skrócił czas odpowiedzi o 25%.",
+      "Prowadził badania i warsztaty z użytkownikami."
+    ],
+    "shown": [
+      "Upraszcza propozycję AI, zamiast ją przepisywać.",
+      "Sprawdza wynik na własnej próbce i podaje liczby.",
+      "Zostawia trudne przypadki człowiekowi."
+    ],
+    "unknown": [
+      "Jak policzono 25% i co było punktem wyjścia.",
+      "Które decyzje w projekcie podjął sam, a które zespół.",
+      "Czy pracował z danymi finansowymi."
+    ],
+    "questions": [
+      {
+        "id": "q1",
+        "question": "W aplikacji piszesz o skróceniu czasu odpowiedzi o 25%. Jak to policzyliście i od czego zaczynaliście?",
+        "strong": "Podaje punkt wyjścia, okres i źródło danych. Mówi, co jeszcze mogło wpłynąć na wynik.",
+        "weak": "Powtarza liczbę bez źródła albo mówi, że „tak wyszło w raportach”.",
+        "verdict": "open",
+        "note": ""
+      },
+      {
+        "id": "q2",
+        "question": "W zadaniu połączyłeś 9 kategorii od AI w 5. Opowiedz o jednej, którą odrzuciłeś, i dlaczego.",
+        "strong": "Podaje konkretne zgłoszenie i mówi, ile kosztowałaby użytkownika zła klasyfikacja.",
+        "weak": "Mówi ogólnie, że „tak było prościej”, bez przykładu.",
+        "verdict": "open",
+        "note": ""
+      },
+      {
+        "id": "q3",
+        "question": "Kto w Twoim projekcie zdecydował, co trafia do automatu, a co do człowieka?",
+        "strong": "Oddziela swoje decyzje od decyzji zespołu i opisuje jedną, z którą się nie zgadzał.",
+        "weak": "Mówi wyłącznie „my” i nie umie wskazać własnej decyzji.",
+        "verdict": "open",
+        "note": ""
+      }
+    ]
+  }
+}
