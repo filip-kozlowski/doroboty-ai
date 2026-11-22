@@ -1,0 +1,261 @@
+/*
+ * "Lawenda" tokens and the workspace shell (sidebar, top bar, mobile header) in
+ * Filip's local direction (doroboty-lavender-ui skill). Page content keeps its own
+ * styles; the employer candidate profile adds recruiter-profile.css.
+ */
+@font-face {
+  font-family: "Young Serif";
+  src: url("./fonts/young-serif-latin-ext.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+@font-face {
+  font-family: "Young Serif";
+  src: url("./fonts/young-serif-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Schibsted Grotesk";
+  src: url("./fonts/schibsted-grotesk-latin-ext.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+@font-face {
+  font-family: "Schibsted Grotesk";
+  src: url("./fonts/schibsted-grotesk-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+.lav-shell,
+.lav {
+  /* text */
+  --ink: #2a1a28;
+  --ink-2: #5e4a5a;
+  --ink-3: #7d6879;
+  /* surfaces */
+  --surface: #ffffff;
+  --wash: #faf6f8;
+  --lilac: #f3e6ef;
+  --line: #ece3ea;
+  --blush: #f7e7ef;
+  --sky: #eef0f7;
+  /* actions */
+  --primary: #6e2a64;
+  --primary-ink: #6e2a64;
+  --primary-hover: #5a2152;
+  /* states */
+  --ok-bg: #d2f4d6;
+  --ok-ink: #17692b;
+  --warn-bg: #ffedd5;
+  --warn-ink: #9a3412;
+  --err-bg: #fde7f5;
+  --err-ink: #b4237f;
+  /* geometry */
+  --r-control: 8px;
+  --r-chip: 10px;
+  --r-card: 12px;
+  --r-panel: 16px;
+  --font-display: "Young Serif", ui-serif, Georgia, serif;
+  --font-ui: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+
+.lav-shell {
+  font-family: var(--font-ui);
+}
+.lav-shell .workspace {
+  background: var(--wash);
+}
+.lav-shell .sidebar {
+  background: var(--surface);
+  box-shadow: inset -1px 0 0 var(--line);
+  padding: 24px 16px 16px;
+}
+.lav-shell .brand {
+  gap: 10px;
+  color: var(--ink);
+  font: 400 22px/1.2 var(--font-display);
+  letter-spacing: -0.01em;
+}
+.lav-shell .brand-tld {
+  color: var(--primary-ink);
+}
+.lav-shell .brand > span[aria-hidden="true"] {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: var(--lilac);
+  color: var(--primary-ink);
+}
+.lav-shell .workspace-label {
+  margin: 24px 0 20px;
+  padding: 16px 8px;
+  box-shadow:
+    inset 0 1px 0 var(--line),
+    inset 0 -1px 0 var(--line);
+}
+.lav-shell .workspace-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-control);
+  background: var(--lilac);
+  box-shadow: none;
+  color: var(--primary-ink);
+  font: 400 15px/1 var(--font-display);
+}
+.lav-shell .workspace-label strong {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.lav-shell .workspace-label div > span {
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+.lav-shell .nav-link {
+  --control-hover-bg: var(--wash);
+  --control-hover-text: var(--ink);
+  gap: 10px;
+  min-height: 38px;
+  margin-bottom: 2px;
+  padding: 0 12px;
+  border-radius: var(--r-control);
+  color: var(--ink-2);
+  font-size: 14.5px;
+  font-weight: 500;
+}
+.lav-shell .nav-link svg {
+  color: var(--ink-3);
+}
+.lav-shell .nav-link:hover {
+  background: var(--wash);
+  color: var(--ink);
+}
+.lav-shell .nav-active,
+.lav-shell .nav-active:hover {
+  --control-hover-bg: var(--lilac);
+  --control-hover-text: var(--primary-ink);
+  background: var(--lilac);
+  color: var(--primary-ink);
+  font-weight: 600;
+}
+.lav-shell .nav-active svg {
+  color: var(--primary-ink);
+}
+.lav-shell .nav-separator {
+  display: block;
+  height: 1px;
+  margin: 12px 4px;
+  background: var(--line);
+}
+.lav-shell .topbar {
+  min-height: 60px;
+  padding: 0 32px;
+  background: var(--surface);
+  box-shadow: inset 0 -1px 0 var(--line);
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.lav-shell .topbar-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  text-decoration: none;
+}
+.lav-shell .topbar-person:hover {
+  color: var(--primary-ink);
+}
+.lav-shell .topbar-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--lilac);
+  color: var(--primary-ink);
+  font: 400 13px/1 var(--font-display);
+}
+.lav-shell :is(.sidebar, .topbar, .mobile-header) :is(a, button):focus-visible {
+  outline: 3px solid var(--lilac);
+  outline-offset: 2px;
+}
+@media (max-width: 767px) {
+  .lav-shell .mobile-header {
+    height: 60px;
+    padding-inline: 16px;
+    background: var(--surface);
+    box-shadow: inset 0 -1px 0 var(--line);
+  }
+  .lav-shell .sidebar-open {
+    top: 60px;
+    padding: 12px 16px 16px;
+    box-shadow:
+      0 8px 24px rgba(42, 26, 40, 0.08),
+      inset 0 -1px 0 var(--line);
+  }
+  .lav-shell .topbar {
+    min-height: 48px;
+    padding-inline: 16px;
+  }
+}
+.lav-shell .mobile-header button {
+  --control-hover-bg: var(--lilac);
+  --control-hover-text: var(--primary-ink);
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+}
+.lav-shell .mobile-header button[aria-expanded="true"] {
+  background: var(--lilac);
+  color: var(--primary-ink);
+}
+/* Paint the sidebar column on the frame too, so long pages never show a gap under it. */
+@media (min-width: 768px) {
+  .lav-shell {
+    background: linear-gradient(
+      to right,
+      var(--surface) 243px,
+      var(--line) 243px 244px,
+      var(--wash) 244px
+    );
+  }
+}
+@media (min-width: 768px) and (max-width: 900px) {
+  .lav-shell {
+    background: linear-gradient(
+      to right,
+      var(--surface) 211px,
+      var(--line) 211px 212px,
+      var(--wash) 212px
+    );
+  }
+}

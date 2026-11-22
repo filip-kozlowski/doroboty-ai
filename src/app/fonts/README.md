@@ -22,3 +22,7 @@ while discarding unused stylistic/italic interpolation. The original is retained
 Generate with FontTools `varLib.instancer` using those axis values and WOFF2 output;
 preserve timestamps for repeatability. FontTools is asset tooling, not a runtime dependency.
 These retained Timeless assets are no longer loaded by the application.
+
+## Lawenda profile fonts
+
+`young-serif-*.woff2` (Young Serif 400) and `schibsted-grotesk-*.woff2` (Schibsted Grotesk, variable 400–700) are the latin and latin-ext subsets served by Google Fonts, both SIL OFL 1.1. They are loaded locally only by `src/app/recruiter-profile.css` for the employer candidate profile in Filip's "Lawenda" direction; no remote font requests are made.

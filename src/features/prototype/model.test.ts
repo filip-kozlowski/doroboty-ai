@@ -139,3 +139,35 @@ describe("coherent browser scenario", () => {
     ).toThrow();
   });
 });
+
+describe("interview cheat sheet", () => {
+  const question = {
+    id: "q1",
+    question: "Jak policzyliście wynik?",
+    strong: "Podaje punkt wyjścia.",
+    weak: "",
+    verdict: "confirmed" as const,
+    note: "Potwierdził.",
+  };
+  it("lets only the hiring company save edited questions and notes", () => {
+    const employer = as(initialState(), "employer-brightlabs");
+    const saved = transition(employer, {
+      type: "briefing",
+      applicationId: "application-example",
+      questions: [question],
+    });
+    expect(saved.applications[0].briefing?.questions).toEqual([question]);
+    expect(stateSchema.parse(saved)).toEqual(saved);
+    const other = as(saved, "employer-northstar");
+    expect(() =>
+      transition(other, { type: "briefing", applicationId: "application-example", questions: [] }),
+    ).toThrow("ściągawki");
+    expect(() =>
+      transition(employer, {
+        type: "briefing",
+        applicationId: "application-example",
+        questions: [{ ...question, question: " " }],
+      }),
+    ).toThrow();
+  });
+});
